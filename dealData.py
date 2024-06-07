@@ -1,6 +1,6 @@
 import re
+from datetime import  datetime
 import matplotlib.pyplot as plt
-
 
 # 从文件中读取数据
 with open('data.txt', 'r') as file:
@@ -16,7 +16,7 @@ for line in lines:
     if 'currentTime' in line:
         time_match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+)', line)
         if time_match:
-            current_time = time_match.group(1)
+            current_time = datetime.strptime(time_match.group(1), '%Y-%m-%d %H:%M:%S.%f')
             time_data.append(current_time)
 
     if 'CPU' in line:
@@ -37,22 +37,26 @@ for line in lines:
 # 绘制图表
 fig, ax1 = plt.subplots(figsize=(10, 6))
 
+# 确保所有数据的长度相同
+min_length = min(len(time_data), len(cpu_data), len(memory_data), len(fps_data))
+time_data = time_data[:min_length]
+cpu_data = cpu_data[:min_length]
+memory_data = memory_data[:min_length]
+fps_data = fps_data[:min_length]
+
 ax1.plot(time_data, cpu_data, marker='o', color='tab:blue', label='CPU Usage')
 ax1.plot(time_data, memory_data, marker='o', color='tab:red', label='Memory Usage')
+ax1.plot(time_data, fps_data, marker='o', color='tab:green', label='FPS')
+
+
 ax1.set_xlabel('Time')
 ax1.set_ylabel('Usage (%)')
 ax1.tick_params(axis='y')
-ax1.legend(loc='upper left')
+ax1.legend(loc='best')
 
-ax2 = ax1.twinx()
-ax2.plot(time_data, fps_data, marker='o', color='tab:green', label='FPS')
-ax2.set_ylabel('FPS')
-ax2.tick_params(axis='y')
-ax2.legend(loc='upper right')
-
-plt.title('CPU, Memory, and FPS Usage Over Time')
-plt.xticks(rotation=45)
+plt.title('CPU Memory FPS Usage Over Time')
+plt.xticks(rotation=90)
 plt.grid(True)
 
 plt.tight_layout()
-plt.show()
+plt.savefig('usage_over_time.png')
