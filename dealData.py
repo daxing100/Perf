@@ -1,6 +1,7 @@
 import re
 import matplotlib.pyplot as plt
 
+
 # 从文件中读取数据
 with open('data.txt', 'r') as file:
     lines = file.readlines()
