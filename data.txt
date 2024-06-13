@@ -1,0 +1,86 @@
+2024-06-13 14:42:52 Morefuns-MacBook-Pro.local pymobiledevice3.cli.remote[51864] INFO tunnel created
+[33m[1mIdentifier: [0m[37m[1m00008101-00185468217A001E[0m
+[33m[1mInterface: [0m[37m[1mutun5[0m
+[33m[1mProtocol: [0m[37m[1mTunnelProtocol.QUIC[0m
+[33m[1mRSD Address: [0m[37m[1mfd1d:f065:64f6::1[0m
+[33m[1mRSD Port: [0m[37m[1m53098[0m
+[33m[1mUse the follow connection option:
+[0m[36m[1m--rsd fd1d:f065:64f6::1 53098[0m
+{'currentTime': '2024-06-13 14:42:53.699310', 'fps': 0, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '0 %', 'Memory': '432.77 MiB', 'DiskReads': '710.18 MiB', 'DiskWrites': '71.53 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:42:54.713225', 'fps': 53, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '39.2 %', 'Memory': '441.77 MiB', 'DiskReads': '714.63 MiB', 'DiskWrites': '72.78 MiB', 'Threads': 26}
+{'currentTime': '2024-06-13 14:42:55.726126', 'fps': 49, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '38.25 %', 'Memory': '449.69 MiB', 'DiskReads': '714.94 MiB', 'DiskWrites': '74.91 MiB', 'Threads': 26}
+{'currentTime': '2024-06-13 14:42:56.733283', 'fps': 47, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '53.63 %', 'Memory': '463.88 MiB', 'DiskReads': '723.15 MiB', 'DiskWrites': '78.46 MiB', 'Threads': 26}
+{'currentTime': '2024-06-13 14:42:57.740424', 'fps': 54, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '33.27 %', 'Memory': '470.47 MiB', 'DiskReads': '723.20 MiB', 'DiskWrites': '80.41 MiB', 'Threads': 26}
+{'currentTime': '2024-06-13 14:42:58.757268', 'fps': 42, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '29.82 %', 'Memory': '473.80 MiB', 'DiskReads': '723.27 MiB', 'DiskWrites': '81.04 MiB', 'Threads': 26}
+{'currentTime': '2024-06-13 14:42:59.775011', 'fps': 56, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '13.19 %', 'Memory': '474.30 MiB', 'DiskReads': '723.37 MiB', 'DiskWrites': '81.21 MiB', 'Threads': 26}
+{'currentTime': '2024-06-13 14:43:00.784866', 'fps': 15, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '13.16 %', 'Memory': '474.25 MiB', 'DiskReads': '723.37 MiB', 'DiskWrites': '81.29 MiB', 'Threads': 25}
+{'currentTime': '2024-06-13 14:43:01.805862', 'fps': 0, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '17.4 %', 'Memory': '474.25 MiB', 'DiskReads': '723.37 MiB', 'DiskWrites': '81.29 MiB', 'Threads': 25}
+{'currentTime': '2024-06-13 14:43:02.821184', 'fps': 0, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '10.76 %', 'Memory': '474.25 MiB', 'DiskReads': '723.37 MiB', 'DiskWrites': '81.29 MiB', 'Threads': 25}
+{'currentTime': '2024-06-13 14:43:03.835198', 'fps': 19, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '10.89 %', 'Memory': '474.25 MiB', 'DiskReads': '723.37 MiB', 'DiskWrites': '81.29 MiB', 'Threads': 25}
+{'currentTime': '2024-06-13 14:43:04.842402', 'fps': 52, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '35.32 %', 'Memory': '480.18 MiB', 'DiskReads': '723.52 MiB', 'DiskWrites': '82.07 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:43:05.854101', 'fps': 51, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '38.76 %', 'Memory': '488.21 MiB', 'DiskReads': '723.54 MiB', 'DiskWrites': '84.59 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:43:06.865392', 'fps': 47, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '50.77 %', 'Memory': '496.00 MiB', 'DiskReads': '723.71 MiB', 'DiskWrites': '87.99 MiB', 'Threads': 24}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '19.87 %', 'Memory': '499.19 MiB', 'DiskReads': '723.72 MiB', 'DiskWrites': '88.70 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:43:07.892173', 'fps': 54, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '12.71 %', 'Memory': '499.19 MiB', 'DiskReads': '723.72 MiB', 'DiskWrites': '88.78 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:43:08.900362', 'fps': 27, 'jankCount': 0, 'bigJankCount': 0}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '17.18 %', 'Memory': '499.19 MiB', 'DiskReads': '723.73 MiB', 'DiskWrites': '88.84 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:43:09.911911', 'fps': 5, 'jank': True}
+{'currentTime': '2024-06-13 14:43:09.911911', 'fps': 5, 'bigJank': True}
+{'currentTime': '2024-06-13 14:43:09.911911', 'fps': 5, 'jankCount': 1, 'bigJankCount': 1}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '13.86 %', 'Memory': '499.19 MiB', 'DiskReads': '723.73 MiB', 'DiskWrites': '88.84 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:43:10.921257', 'fps': 2, 'jank': True}
+{'currentTime': '2024-06-13 14:43:10.921257', 'fps': 2, 'bigJank': True}
+{'currentTime': '2024-06-13 14:43:10.921257', 'fps': 2, 'jankCount': 2, 'bigJankCount': 2}
+{'currentTime': '2024-06-13 14:43:11.932844', 'fps': 0, 'jankCount': 2, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '11.16 %', 'Memory': '499.19 MiB', 'DiskReads': '723.73 MiB', 'DiskWrites': '88.84 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:43:12.936673', 'fps': 0, 'jankCount': 2, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '16.7 %', 'Memory': '499.19 MiB', 'DiskReads': '723.73 MiB', 'DiskWrites': '88.84 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:43:13.944820', 'fps': 0, 'jankCount': 2, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '12.26 %', 'Memory': '499.19 MiB', 'DiskReads': '723.73 MiB', 'DiskWrites': '88.84 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:43:14.962106', 'fps': 0, 'jankCount': 2, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '11.13 %', 'Memory': '499.19 MiB', 'DiskReads': '723.73 MiB', 'DiskWrites': '88.84 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:43:15.984731', 'fps': 0, 'jankCount': 2, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '16.9 %', 'Memory': '499.19 MiB', 'DiskReads': '723.73 MiB', 'DiskWrites': '88.84 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:43:16.999153', 'fps': 0, 'jankCount': 2, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '12.84 %', 'Memory': '499.19 MiB', 'DiskReads': '723.73 MiB', 'DiskWrites': '88.84 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:43:18.005777', 'fps': 2, 'jankCount': 2, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '18.62 %', 'Memory': '500.28 MiB', 'DiskReads': '723.75 MiB', 'DiskWrites': '89.04 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:43:19.019294', 'fps': 56, 'jankCount': 2, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '39.37 %', 'Memory': '505.30 MiB', 'DiskReads': '723.83 MiB', 'DiskWrites': '91.52 MiB', 'Threads': 25}
+{'currentTime': '2024-06-13 14:43:20.029389', 'fps': 53, 'jankCount': 2, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '43.97 %', 'Memory': '518.63 MiB', 'DiskReads': '723.96 MiB', 'DiskWrites': '93.39 MiB', 'Threads': 25}
+{'currentTime': '2024-06-13 14:43:21.042729', 'fps': 52, 'jankCount': 2, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '36.68 %', 'Memory': '527.44 MiB', 'DiskReads': '724.30 MiB', 'DiskWrites': '96.36 MiB', 'Threads': 25}
+{'currentTime': '2024-06-13 14:43:22.054033', 'fps': 49, 'jankCount': 2, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '23.67 %', 'Memory': '533.41 MiB', 'DiskReads': '724.43 MiB', 'DiskWrites': '97.15 MiB', 'Threads': 25}
+{'currentTime': '2024-06-13 14:43:23.069241', 'fps': 60, 'jankCount': 2, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '20.65 %', 'Memory': '534.24 MiB', 'DiskReads': '724.45 MiB', 'DiskWrites': '98.13 MiB', 'Threads': 25}
+{'currentTime': '2024-06-13 14:43:24.078751', 'fps': 51, 'jankCount': 2, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '13.36 %', 'Memory': '534.25 MiB', 'DiskReads': '724.45 MiB', 'DiskWrites': '98.13 MiB', 'Threads': 25}
+{'currentTime': '2024-06-13 14:43:25.096790', 'fps': 54, 'jankCount': 2, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '20.13 %', 'Memory': '534.27 MiB', 'DiskReads': '724.45 MiB', 'DiskWrites': '98.17 MiB', 'Threads': 25}
+{'currentTime': '2024-06-13 14:43:26.111805', 'fps': 9, 'jank': True}
+{'currentTime': '2024-06-13 14:43:26.111805', 'fps': 9, 'jankCount': 3, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '11.33 %', 'Memory': '534.25 MiB', 'DiskReads': '724.45 MiB', 'DiskWrites': '98.17 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:43:27.130786', 'fps': 0, 'jankCount': 3, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '12.26 %', 'Memory': '534.25 MiB', 'DiskReads': '724.45 MiB', 'DiskWrites': '98.17 MiB', 'Threads': 24}
+{'currentTime': '2024-06-13 14:43:28.151842', 'fps': 0, 'jankCount': 3, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '16.79 %', 'Memory': '534.24 MiB', 'DiskReads': '724.45 MiB', 'DiskWrites': '98.17 MiB', 'Threads': 23}
+{'currentTime': '2024-06-13 14:43:29.168972', 'fps': 0, 'jankCount': 3, 'bigJankCount': 2}
+{'Pid': 5315, 'Name': 'JD4iPhone', 'CPU': '13.1 %', 'Memory': '534.24 MiB', 'DiskReads': '724.45 MiB', 'DiskWrites': '98.17 MiB', 'Threads': 23}
+2024-06-13 14:43:30 Morefuns-MacBook-Pro.local pymobiledevice3.cli.remote[51864] INFO tunnel was closed

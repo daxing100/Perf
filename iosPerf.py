@@ -90,11 +90,39 @@ class PerformanceAnalyzer:
                 rpc.sysmontap(on_callback_proc_message, 1000)
 
     def ios17_fps_perf(self):
-        """ Get fps data """
+        jank_count = [0]
+        big_jank_count = [0]
+        frame_times = []
 
         def on_callback_fps_message(res):
             data = res.selector
-            print_json({"currentTime": str(datetime.now()), "fps": data['CoreAnimationFramesPerSecond']}, format)
+            current_fps = data['CoreAnimationFramesPerSecond']
+            now = datetime.now()
+            if current_fps == 0:
+                # 避免除以零错误
+                frame_time = float('inf')  # 或者你可以选择其他适当的值，如一个非常大的数字
+            else:
+                frame_time = 1 / current_fps * 1000  # 将FPS转换为毫秒的帧时间
+            # 跟踪最近的三帧时间
+            frame_times.append(frame_time)
+            if len(frame_times) > 3:
+                frame_times.pop(0)
+
+            # 检查Jank和BigJank
+            if len(frame_times) == 3:
+                avg_frame_time = sum(frame_times) / len(frame_times)
+                movie_frame_time = 1000 / 24 * 2  # 24 FPS视频的两帧时间
+                if frame_time > avg_frame_time * 2 and frame_time > movie_frame_time:
+                    jank_count[0] += 1
+                    print_json({"currentTime": str(now), "fps": current_fps, "jank": True}, format)
+                if frame_time > avg_frame_time * 2 and frame_time > 1000 / 24 * 3:  # 24 FPS视频的三帧时间
+                    big_jank_count[0] += 1
+                    print_json({"currentTime": str(now), "fps": current_fps, "bigJank": True}, format)
+
+            # 输出结果
+            print_json(
+                {"currentTime": str(now), "fps": current_fps, "jankCount": jank_count[0], "bigJankCount": big_jank_count[0]},
+                format)
 
         with RemoteLockdownClient((self.host, self.port)) as rsd:
             with InstrumentsBase(udid=self.udid, network=False, lockdown=rsd) as rpc:
@@ -107,7 +135,7 @@ if __name__ == '__main__':
         assert ctypes.windll.shell32.IsUserAnAdmin() == 1, "必须使用管理员权限启动"
     else:
         assert os.geteuid() == 0, "必须使用sudo权限启动"
-    bundle_id = "com.juqitech.niumowang"
+    bundle_id = "com.360buy.jdmobile"
     udid = "00008101-00185468217A001E"
     tunnel_manager = TunnelManager()
     tunnel_manager.get_tunnel()
