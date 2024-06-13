@@ -107,8 +107,8 @@ if __name__ == '__main__':
         assert ctypes.windll.shell32.IsUserAnAdmin() == 1, "必须使用管理员权限启动"
     else:
         assert os.geteuid() == 0, "必须使用sudo权限启动"
-    bundle_id = "com.juqitech.niumowang"
-    udid = "00008101-00185468217A001E"
+    bundle_id = "com.*.*"
+    udid = "****-00185468217A001E"
     tunnel_manager = TunnelManager()
     tunnel_manager.get_tunnel()
 
