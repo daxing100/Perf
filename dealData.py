@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 with open('data.txt', 'r') as file:
     lines = file.readlines()
 
-# 提取 CPU、Memory 和 FPS 的信息
+# 提取信息
 cpu_data = []
 memory_data = []
 fps_data = []
