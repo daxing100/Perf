@@ -106,4 +106,4 @@ plt.xticks(rotation=90)
 plt.grid(True)
 
 plt.tight_layout(rect=(0, 0, 1, 0.96))
-plt.savefig('usage_over_time.png')
+plt.savefig('ios_17+_perf.png')

@@ -1,12 +1,10 @@
-# ios17Perf
+# Perf
 
-修改iosPerf文件
+android执行命令：
 
-bundle_id = "Your App BundleId" // t3 app list
+python3 android/androidPerf.py --package_name com.*.* --interval 3 --duration 30
 
-udid = "Your IPhone UDID" //t3 list
 
+ios执行命令：
 修改dealData文件中cpu_data.append(float(cpu_match.group(1)) / x), x为测试机器的CPU核数
 
-Jank计算参考PerfDog
-![img.png](img.png)
