@@ -91,7 +91,7 @@ def get_memory_usage(package_name):
 
 
 def get_realtime_fps():
-    output = subprocess.getoutput("adb shell dumpsys SurfaceFlinger --latency")
+    output = subprocess.getoutput("adb shell dumpsys SurfaceFlinger --latency")  # 获取的数值时间单位为纳秒
 
     frame_times_ns = []
     for line in output.splitlines():
@@ -105,7 +105,7 @@ def get_realtime_fps():
         return None
 
     avg_frame_time_ns = sum(frame_times_ns) / len(frame_times_ns)
-    avg_frame_time_s = avg_frame_time_ns / 1e9
+    avg_frame_time_s = avg_frame_time_ns / 1e9  # 纳秒单位转为秒
     fps = 1 / avg_frame_time_s
     return fps, frame_times_ns
 
