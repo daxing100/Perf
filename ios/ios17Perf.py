@@ -12,12 +12,15 @@ import sys
 import threading
 import time
 import argparse
+import matplotlib.pyplot as plt
+import json
 from datetime import datetime
 
 from ios_device.cli.base import InstrumentsBase
 from ios_device.cli.cli import print_json
 from ios_device.remote.remote_lockdown import RemoteLockdownClient
 from ios_device.util.utils import convertBytes
+from dealData import dealData
 
 cpu_data = []
 memory_data = []
@@ -63,121 +66,180 @@ class PerformanceAnalyzer:
         self.host = host
         self.port = port
 
-    def ios17_proc_perf(self, bundle_id, duration):
+    def ios17_proc_perf(self, bundle_id):
         """ Get application performance data """
-        start_time = time.time()
-        end_time = start_time + duration
-
         proc_filter = ['Pid', 'Name', 'CPU', 'Memory', 'DiskReads', 'DiskWrites', 'Threads']
         process_attributes = dataclasses.make_dataclass('SystemProcessAttributes', proc_filter)
 
-        while time.time() < end_time:
-            def on_callback_proc_message(res):
-                if isinstance(res.selector, list):
-                    for index, row in enumerate(res.selector):
-                        if 'Processes' in row:
-                            for _pid, process in row['Processes'].items():
-                                attrs = process_attributes(*process)
-                                if name and attrs.Name != name:
-                                    continue
-                                if not attrs.CPU:
-                                    attrs.CPU = 0
-                                attrs.CPU = f'{round(attrs.CPU, 2)} %'
-                                cpu_data.append(attrs.CPU)
-                                print(cpu_data)
-                                attrs.Memory = convertBytes(attrs.Memory)
-                                memory_data.append(attrs.Memory)
-                                print(memory_data)
-                                attrs.DiskReads = convertBytes(attrs.DiskReads)
-                                attrs.DiskWrites = convertBytes(attrs.DiskWrites)
-                                print_json(attrs.__dict__, format)
+        def on_callback_proc_message(res):
+            if isinstance(res.selector, list):
+                for index, row in enumerate(res.selector):
+                    if 'Processes' in row:
+                        for _pid, process in row['Processes'].items():
+                            attrs = process_attributes(*process)
+                            if name and attrs.Name != name:
+                                continue
+                            if not attrs.CPU:
+                                attrs.CPU = 0
+                            attrs.CPU = f'{round(attrs.CPU, 2)} %'
+                            attrs.Memory = convertBytes(attrs.Memory)
+                            attrs.DiskReads = convertBytes(attrs.DiskReads)
+                            attrs.DiskWrites = convertBytes(attrs.DiskWrites)
+                            print_json(attrs.__dict__, format)
+                            data = {
+                                "CPU": str(attrs.CPU),
+                                "Memory": str(attrs.Memory),
+                            }
+                            with open('data.txt', 'a') as f:
+                                f.write(json.dumps(data) + '\n')
 
+        with RemoteLockdownClient((self.host, self.port)) as rsd:
+            with InstrumentsBase(udid=self.udid, network=False, lockdown=rsd) as rpc:
+                rpc.process_attributes = ['pid', 'name', 'cpuUsage', 'physFootprint',
+                                          'diskBytesRead', 'diskBytesWritten', 'threadCount']
+                if bundle_id:
+                    app = rpc.application_listing(bundle_id)
+                    if not app:
+                        print(f"not find {bundle_id}")
+                        return
+                    name = app.get('ExecutableName')
+                rpc.sysmontap(on_callback_proc_message, 1000)
 
-            with RemoteLockdownClient((self.host, self.port)) as rsd:
-                with InstrumentsBase(udid=self.udid, network=False, lockdown=rsd) as rpc:
-                    rpc.process_attributes = ['pid', 'name', 'cpuUsage', 'physFootprint',
-                                              'diskBytesRead', 'diskBytesWritten', 'threadCount']
-                    if bundle_id:
-                        app = rpc.application_listing(bundle_id)
-                        if not app:
-                            print(f"not find {bundle_id}")
-                            return
-                        name = app.get('ExecutableName')
-                    rpc.sysmontap(on_callback_proc_message, 1000)
-
-    def ios17_fps_perf(self,duration):
+    def ios17_fps_perf(self):
         jank_count = [0]
         big_jank_count = [0]
         frame_times = []
-        start_time = time.time()
-        end_time = start_time + duration
+        fps_data = []
+        jank_data = []
+        big_jank_data = []
 
-        while time.time() < end_time:
-            def on_callback_fps_message(res):
-                data = res.selector
-                current_fps = data['CoreAnimationFramesPerSecond']
-                now = datetime.now()
-                if current_fps == 0:
-                    # 避免除以零错误
-                    frame_time = float('inf')  # 或者你可以选择其他适当的值，如一个非常大的数字
-                else:
-                    frame_time = 1 / current_fps * 1000  # 将FPS转换为毫秒的帧时间
-                # 跟踪最近的三帧时间
-                frame_times.append(frame_time)
-                if len(frame_times) > 3:
-                    frame_times.pop(0)
+        def on_callback_fps_message(res):
+            nonlocal jank_count, big_jank_count, frame_times, fps_data, jank_data, big_jank_data
+            data = res.selector
+            current_fps = data['CoreAnimationFramesPerSecond']
+            now = datetime.now()
+            if current_fps == 0:
+                frame_time = float('inf')
+            else:
+                frame_time = 1 / current_fps * 1000
+            frame_times.append(frame_time)
+            if len(frame_times) > 3:
+                frame_times.pop(0)
+            if len(frame_times) == 3:
+                avg_frame_time = sum(frame_times) / len(frame_times)
+                movie_frame_time = 1000 / 24 * 2  # 24 FPS视频的两帧时间
+                if frame_time > avg_frame_time * 2 and frame_time > movie_frame_time:
+                    jank_count[0] += 1
 
-                # 检查Jank和BigJank
-                if len(frame_times) == 3:
-                    avg_frame_time = sum(frame_times) / len(frame_times)
-                    movie_frame_time = 1000 / 24 * 2  # 24 FPS视频的两帧时间
-                    if frame_time > avg_frame_time * 2 and frame_time > movie_frame_time:
-                        jank_count[0] += 1
-                        print_json({"currentTime": str(now), "fps": current_fps, "jank": True}, format)
-                    if frame_time > avg_frame_time * 2 and frame_time > 1000 / 24 * 3:  # 24 FPS视频的三帧时间
-                        big_jank_count[0] += 1
-                        print_json({"currentTime": str(now), "fps": current_fps, "bigJank": True}, format)
-                fps_data.append(current_fps)
-                print(fps_data)
-                jank_data.append(jank_count[0])
-                print(jank_data)
-                big_jank_data.append(big_jank_count[0])
-                print(big_jank_data)
+                if frame_time > avg_frame_time * 2 and frame_time > 1000 / 24 * 3:  # 24 FPS视频的三帧时间
+                    big_jank_count[0] += 1
 
-                # 输出结果
-                print_json(
-                    {"currentTime": str(now), "fps": current_fps, "jankCount": jank_count[0], "bigJankCount": big_jank_count[0]},
-                    format)
+            fps_data.append(current_fps)
+            jank_data.append(jank_count[0])
+            big_jank_data.append(big_jank_count[0])
+            data = {
+                "currentTime": str(now),
+                "fps": current_fps,
+                "jankCount": jank_count[0],
+                "bigJankCount": big_jank_count[0]
+            }
+            with open('data.txt', 'a') as f:
+                f.write(json.dumps(data) + '\n')
 
-            with RemoteLockdownClient((self.host, self.port)) as rsd:
-                with InstrumentsBase(udid=self.udid, network=False, lockdown=rsd) as rpc:
-                    rpc.graphics(on_callback_fps_message, 1000)
-                    while time.time() < end_time:
-                        time.sleep(1)
-            return True
+        with RemoteLockdownClient((self.host, self.port)) as rsd:
+            with InstrumentsBase(udid=self.udid, network=False, lockdown=rsd) as rpc:
+                rpc.graphics(on_callback_fps_message, 1000)
 
+def convert_memory_usage(memory_str):
+    if ' MiB' in memory_str:
+        return float(memory_str.replace(' MiB', '').replace(',', ''))
+    elif ' KiB' in memory_str:
+        return float(memory_str.replace(' KiB', '').replace(',', '')) / 1024
+    else:
+        raise ValueError(f"Unexpected memory format: {memory_str}")
+def plot_process_metrics(metrics):
+    for metric in metrics:
+        metric['CPU'] = float(metric['CPU'].strip(' %'))
+        metric['Memory'] = convert_memory_usage(metric['Memory'])
+
+    times = [datetime.strptime(metric['currentTime'], '%Y-%m-%d %H:%M:%S.%f') for metric in metrics]
+    cpu = [metric['CPU'] for metric in metrics]
+    memory = [metric['Memory'] for metric in metrics]
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(times, cpu, label='CPU Usage')
+    plt.plot(times, memory, label='Memory Usage (MB)')
+
+    # 每隔2秒标记一次数值
+    start_time = times[0]
+    for i, time in enumerate(times):
+        if (time - start_time).total_seconds() % 2 == 0:
+            plt.annotate(f'{cpu[i]:.2f}%', (time, cpu[i]), textcoords="offset points", xytext=(0,10), ha='center')
+            plt.annotate(f'{memory[i]:.2f}', (time, memory[i]), textcoords="offset points", xytext=(0,-15), ha='center')
+
+    plt.xlabel('Time')
+    plt.ylabel('Usage')
+    plt.title('Process Metrics')
+    plt.legend()
+    plt.savefig('ios_process_metrics.png')
+
+def plot_fps_metrics(metrics):
+    times = [datetime.strptime(metric['currentTime'], '%Y-%m-%d %H:%M:%S.%f') for metric in metrics]
+    fps = [float(metric['fps']) for metric in metrics]
+    jank_count = [int(metric['jankCount']) for metric in metrics]
+    big_jank_count = [int(metric['bigJankCount']) for metric in metrics]
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(times, fps, label='FPS')
+    plt.plot(times, jank_count, label='Jank Count')
+    plt.plot(times, big_jank_count, label='Big Jank Count')
+
+    # 每隔2秒标记一次数值
+    start_time = times[0]
+    for i, time in enumerate(times):
+        if (time - start_time).total_seconds() % 2 == 0:
+            plt.annotate(f'{fps[i]:.2f}', (time, fps[i]), textcoords="offset points", xytext=(0,10), ha='center')
+            plt.annotate(f'{jank_count[i]}', (time, jank_count[i]), textcoords="offset points", xytext=(0,-15), ha='center')
+            plt.annotate(f'{big_jank_count[i]}', (time, big_jank_count[i]), textcoords="offset points", xytext=(0,-30), ha='center')
+
+    plt.xlabel('Time')
+    plt.ylabel('Count')
+    plt.title('FPS Metrics')
+    plt.legend()
+    plt.savefig('ios_fps_metrics.png')
 
 
 if __name__ == '__main__':
+
     if "Windows" in platform.platform():
         import ctypes
+
         assert ctypes.windll.shell32.IsUserAnAdmin() == 1, "必须使用管理员权限启动"
     else:
         assert os.geteuid() == 0, "必须使用sudo权限启动"
+    if os.path.exists('data.txt') and os.path.getsize('data.txt') > 0:
+        os.remove('data.txt')
 
     parser = argparse.ArgumentParser(description='Performance Analyzer')
-    parser.add_argument('--bundle_id',dest='bundle_id', type=str, help='Bundle ID of the application')
+    parser.add_argument('--bundle_id', dest='bundle_id', type=str, help='Bundle ID of the application')
     parser.add_argument('--udid', dest='udid', type=str, help='UDID of the device')
-    parser.add_argument('--duration', dest='duration', type=int, help='Duration of the test in seconds')
-
     args = parser.parse_args()
     bundle_id = args.bundle_id
     udid = args.udid
-    duration = args.duration
 
     tunnel_manager = TunnelManager()
     tunnel_manager.get_tunnel()
     performance_analyzer = PerformanceAnalyzer(udid, tunnel_manager.tunnel_host, tunnel_manager.tunnel_port)
-    threading.Thread(target=performance_analyzer.ios17_proc_perf, args=(bundle_id,duration)).start()
+    threading.Thread(target=performance_analyzer.ios17_proc_perf, args=(bundle_id,)).start()
     time.sleep(0.1)
-    threading.Thread(target=performance_analyzer.ios17_fps_perf, args=(duration,)).start()
+    threading.Thread(target=performance_analyzer.ios17_fps_perf, args=()).start()
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("Interrupted. Plotting graphs...")
+        dealData('data.txt')
+
+
+
