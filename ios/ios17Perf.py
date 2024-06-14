@@ -157,57 +157,6 @@ def convert_memory_usage(memory_str):
         return float(memory_str.replace(' KiB', '').replace(',', '')) / 1024
     else:
         raise ValueError(f"Unexpected memory format: {memory_str}")
-def plot_process_metrics(metrics):
-    for metric in metrics:
-        metric['CPU'] = float(metric['CPU'].strip(' %'))
-        metric['Memory'] = convert_memory_usage(metric['Memory'])
-
-    times = [datetime.strptime(metric['currentTime'], '%Y-%m-%d %H:%M:%S.%f') for metric in metrics]
-    cpu = [metric['CPU'] for metric in metrics]
-    memory = [metric['Memory'] for metric in metrics]
-
-    plt.figure(figsize=(10, 6))
-    plt.plot(times, cpu, label='CPU Usage')
-    plt.plot(times, memory, label='Memory Usage (MB)')
-
-    # 每隔2秒标记一次数值
-    start_time = times[0]
-    for i, time in enumerate(times):
-        if (time - start_time).total_seconds() % 2 == 0:
-            plt.annotate(f'{cpu[i]:.2f}%', (time, cpu[i]), textcoords="offset points", xytext=(0,10), ha='center')
-            plt.annotate(f'{memory[i]:.2f}', (time, memory[i]), textcoords="offset points", xytext=(0,-15), ha='center')
-
-    plt.xlabel('Time')
-    plt.ylabel('Usage')
-    plt.title('Process Metrics')
-    plt.legend()
-    plt.savefig('ios_process_metrics.png')
-
-def plot_fps_metrics(metrics):
-    times = [datetime.strptime(metric['currentTime'], '%Y-%m-%d %H:%M:%S.%f') for metric in metrics]
-    fps = [float(metric['fps']) for metric in metrics]
-    jank_count = [int(metric['jankCount']) for metric in metrics]
-    big_jank_count = [int(metric['bigJankCount']) for metric in metrics]
-
-    plt.figure(figsize=(10, 6))
-    plt.plot(times, fps, label='FPS')
-    plt.plot(times, jank_count, label='Jank Count')
-    plt.plot(times, big_jank_count, label='Big Jank Count')
-
-    # 每隔2秒标记一次数值
-    start_time = times[0]
-    for i, time in enumerate(times):
-        if (time - start_time).total_seconds() % 2 == 0:
-            plt.annotate(f'{fps[i]:.2f}', (time, fps[i]), textcoords="offset points", xytext=(0,10), ha='center')
-            plt.annotate(f'{jank_count[i]}', (time, jank_count[i]), textcoords="offset points", xytext=(0,-15), ha='center')
-            plt.annotate(f'{big_jank_count[i]}', (time, big_jank_count[i]), textcoords="offset points", xytext=(0,-30), ha='center')
-
-    plt.xlabel('Time')
-    plt.ylabel('Count')
-    plt.title('FPS Metrics')
-    plt.legend()
-    plt.savefig('ios_fps_metrics.png')
-
 
 if __name__ == '__main__':
 
