@@ -3,7 +3,9 @@
 sudo python3 iosPerf.pt > data.txt
 """
 
+import argparse
 import dataclasses
+import json
 import os
 import platform
 import re
@@ -28,44 +30,35 @@ fps_data = []
 jank_data = []
 big_jank_data = []
 
-class MyClass:
+class TunnelManager:
     def __init__(self):
-        self.tunnel_host = None  # 初始化隧道主机地址
-        self.tunnel_port = None  # 初始化隧道端口号
-        self.start_event = threading.Event()  # 创建事件对象，用于线程同步
+        self.start_event = threading.Event()
+        self.tunnel_host = None
+        self.tunnel_port = None
 
-    def start_tunnel(self):
-        # 启动子进程执行命令
-        rp = subprocess.Popen([sys.executable, "-m", "pymobiledevice3", "remote", "start-tunnel"],
-                              stdout=subprocess.PIPE,
-                              stderr=subprocess.STDOUT)
-        
-        # 循环读取子进程输出
-        while rp.poll() is None:  # 当子进程运行中
-            try:
-                line = rp.stdout.readline().decode()  # 读取子进程输出并解码
-            except Exception as e:
-                print(f"Failed to decode line: {str(e)}")
-                continue
-            
-            line = line.strip()  # 去除首尾空白字符
-            if line:
-                print(line)  # 输出非空行内容到控制台
-            if "--rsd" in line:
-                ipv6_pattern = r'--rsd\s+(\S+)\s+'
-                port_pattern = r'\s+(\d{1,5})\b'
-                # 使用正则表达式提取IPv6地址和端口号
+    def get_tunnel(self):
+        def start_tunnel():
+            rp = subprocess.Popen([sys.executable, "-m", "pymobiledevice3", "remote", "start-tunnel"],
+                                  stdout=subprocess.PIPE,
+                                  stderr=subprocess.STDOUT)
+            while not rp.poll():
                 try:
+                    line = rp.stdout.readline().decode()
+                except:
+                    print("decode fail {0}".format(line))
+                    continue
+                line = line.strip()
+                if line:
+                    print(line)
+                if "--rsd" in line:
+                    ipv6_pattern = r'--rsd\s+(\S+)\s+'
+                    port_pattern = r'\s+(\d{1,5})\b'
                     self.tunnel_host = re.search(ipv6_pattern, line).group(1)
                     self.tunnel_port = int(re.search(port_pattern, line).group(1))
-                    self.start_event.set()  # 设置事件，表示隧道已启动
-                except Exception as e:
-                    print(f"Failed to extract host/port: {str(e)}")
+                    self.start_event.set()
 
-    def start_tunnel_thread(self):
-        # 创建线程并启动隧道连接
-        threading.Thread(target=self.start_tunnel).start()
-        self.start_event.wait(timeout=15)  # 等待事件发生或超时（15秒）
+        threading.Thread(target=start_tunnel).start()
+        self.start_event.wait(timeout=15)
 
 
 class PerformanceAnalyzer:
@@ -75,22 +68,22 @@ class PerformanceAnalyzer:
         self.port = port
 
     def ios17_proc_perf(self, bundle_id):
-    """ 
-    获取应用程序性能数据
-    Args:
-        bundle_id (str): 应用程序的Bundle ID
-    """
+        """
+        获取应用程序性能数据
+        Args:
+            bundle_id (str): 应用程序的Bundle ID
+        """
         # 定义要提取的进程属性字段
         proc_filter = ['Pid', 'Name', 'CPU', 'Memory', 'DiskReads', 'DiskWrites', 'Threads']
         # 创建一个数据类以存储系统进程属性
         process_attributes = dataclasses.make_dataclass('SystemProcessAttributes', proc_filter)
 
         def on_callback_proc_message(res):
-        """ 
-        处理来自sysmontap的进程消息回调
-        Args:
-            res (object): 包含进程信息的回调结果对象
-        """
+            """
+            处理来自sysmontap的进程消息回调
+            Args:
+                res (object): 包含进程信息的回调结果对象
+            """
             if isinstance(res.selector, list):
                 for index, row in enumerate(res.selector):
                     if 'Processes' in row:
@@ -132,9 +125,9 @@ class PerformanceAnalyzer:
                 rpc.sysmontap(on_callback_proc_message, 1000)
 
     def ios17_fps_perf(self):
-    """ 
-    获取设备FPS并计算Jank和BigJank的数据
-    """
+        """
+        获取设备FPS并计算Jank和BigJank的数据
+        """
         jank_count = [0]
         big_jank_count = [0]
         frame_times = []
