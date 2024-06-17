@@ -28,35 +28,44 @@ fps_data = []
 jank_data = []
 big_jank_data = []
 
-class TunnelManager:
+class MyClass:
     def __init__(self):
-        self.start_event = threading.Event()
-        self.tunnel_host = None
-        self.tunnel_port = None
+        self.tunnel_host = None  # 初始化隧道主机地址
+        self.tunnel_port = None  # 初始化隧道端口号
+        self.start_event = threading.Event()  # 创建事件对象，用于线程同步
 
-    def get_tunnel(self):
-        def start_tunnel():
-            rp = subprocess.Popen([sys.executable, "-m", "pymobiledevice3", "remote", "start-tunnel"],
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.STDOUT)
-            while not rp.poll():
+    def start_tunnel(self):
+        # 启动子进程执行命令
+        rp = subprocess.Popen([sys.executable, "-m", "pymobiledevice3", "remote", "start-tunnel"],
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.STDOUT)
+        
+        # 循环读取子进程输出
+        while rp.poll() is None:  # 当子进程运行中
+            try:
+                line = rp.stdout.readline().decode()  # 读取子进程输出并解码
+            except Exception as e:
+                print(f"Failed to decode line: {str(e)}")
+                continue
+            
+            line = line.strip()  # 去除首尾空白字符
+            if line:
+                print(line)  # 输出非空行内容到控制台
+            if "--rsd" in line:
+                ipv6_pattern = r'--rsd\s+(\S+)\s+'
+                port_pattern = r'\s+(\d{1,5})\b'
+                # 使用正则表达式提取IPv6地址和端口号
                 try:
-                    line = rp.stdout.readline().decode()
-                except:
-                    print("decode fail {0}".format(line))
-                    continue
-                line = line.strip()
-                if line:
-                    print(line)
-                if "--rsd" in line:
-                    ipv6_pattern = r'--rsd\s+(\S+)\s+'
-                    port_pattern = r'\s+(\d{1,5})\b'
                     self.tunnel_host = re.search(ipv6_pattern, line).group(1)
                     self.tunnel_port = int(re.search(port_pattern, line).group(1))
-                    self.start_event.set()
+                    self.start_event.set()  # 设置事件，表示隧道已启动
+                except Exception as e:
+                    print(f"Failed to extract host/port: {str(e)}")
 
-        threading.Thread(target=start_tunnel).start()
-        self.start_event.wait(timeout=15)
+    def start_tunnel_thread(self):
+        # 创建线程并启动隧道连接
+        threading.Thread(target=self.start_tunnel).start()
+        self.start_event.wait(timeout=15)  # 等待事件发生或超时（15秒）
 
 
 class PerformanceAnalyzer:
@@ -66,25 +75,39 @@ class PerformanceAnalyzer:
         self.port = port
 
     def ios17_proc_perf(self, bundle_id):
-        """ Get application performance data """
+    """ 
+    获取应用程序性能数据
+    Args:
+        bundle_id (str): 应用程序的Bundle ID
+    """
+        # 定义要提取的进程属性字段
         proc_filter = ['Pid', 'Name', 'CPU', 'Memory', 'DiskReads', 'DiskWrites', 'Threads']
+        # 创建一个数据类以存储系统进程属性
         process_attributes = dataclasses.make_dataclass('SystemProcessAttributes', proc_filter)
 
         def on_callback_proc_message(res):
+        """ 
+        处理来自sysmontap的进程消息回调
+        Args:
+            res (object): 包含进程信息的回调结果对象
+        """
             if isinstance(res.selector, list):
                 for index, row in enumerate(res.selector):
                     if 'Processes' in row:
                         for _pid, process in row['Processes'].items():
                             attrs = process_attributes(*process)
+                            # 如果指定了应用程序名称，但当前进程不匹配，则跳过
                             if name and attrs.Name != name:
                                 continue
                             if not attrs.CPU:
                                 attrs.CPU = 0
+                            # 转换CPU、内存、磁盘读写数据的单位
                             attrs.CPU = f'{round(attrs.CPU, 2)} %'
                             attrs.Memory = convertBytes(attrs.Memory)
                             attrs.DiskReads = convertBytes(attrs.DiskReads)
                             attrs.DiskWrites = convertBytes(attrs.DiskWrites)
                             print_json(attrs.__dict__, format)
+                            # 将数据写入文件
                             data = {
                                 "CPU": str(attrs.CPU),
                                 "Memory": str(attrs.Memory),
@@ -92,10 +115,14 @@ class PerformanceAnalyzer:
                             with open('data.txt', 'a') as f:
                                 f.write(json.dumps(data) + '\n')
 
+        # 使用RemoteLockdownClient连接到远程设备服务
         with RemoteLockdownClient((self.host, self.port)) as rsd:
+            # 使用InstrumentsBase设置连接属性
             with InstrumentsBase(udid=self.udid, network=False, lockdown=rsd) as rpc:
+                # 指定要获取的进程属性
                 rpc.process_attributes = ['pid', 'name', 'cpuUsage', 'physFootprint',
                                           'diskBytesRead', 'diskBytesWritten', 'threadCount']
+                # 如果指定了应用程序的Bundle ID，则获取应用程序的可执行名称
                 if bundle_id:
                     app = rpc.application_listing(bundle_id)
                     if not app:
@@ -105,6 +132,9 @@ class PerformanceAnalyzer:
                 rpc.sysmontap(on_callback_proc_message, 1000)
 
     def ios17_fps_perf(self):
+    """ 
+    获取设备FPS并计算Jank和BigJank的数据
+    """
         jank_count = [0]
         big_jank_count = [0]
         frame_times = []
@@ -115,21 +145,26 @@ class PerformanceAnalyzer:
         def on_callback_fps_message(res):
             nonlocal jank_count, big_jank_count, frame_times, fps_data, jank_data, big_jank_data
             data = res.selector
+            # 获取当前帧率
             current_fps = data['CoreAnimationFramesPerSecond']
             now = datetime.now()
             if current_fps == 0:
+                # 如果帧率为0，则帧时间为无穷大
                 frame_time = float('inf')
             else:
+                # 计算每帧的时间（毫秒）
                 frame_time = 1 / current_fps * 1000
             frame_times.append(frame_time)
             if len(frame_times) > 3:
+                # 如果列表超过3个元素，则移除第一个，保持最新的3个帧时间
                 frame_times.pop(0)
             if len(frame_times) == 3:
                 avg_frame_time = sum(frame_times) / len(frame_times)
                 movie_frame_time = 1000 / 24 * 2  # 24 FPS视频的两帧时间
+                # 判断是否出现普通卡顿
                 if frame_time > avg_frame_time * 2 and frame_time > movie_frame_time:
                     jank_count[0] += 1
-
+                # 判断是否出现严重卡顿
                 if frame_time > avg_frame_time * 2 and frame_time > 1000 / 24 * 3:  # 24 FPS视频的三帧时间
                     big_jank_count[0] += 1
 
@@ -142,6 +177,7 @@ class PerformanceAnalyzer:
                 "jankCount": jank_count[0],
                 "bigJankCount": big_jank_count[0]
             }
+            # 数据写入文件
             with open('data.txt', 'a') as f:
                 f.write(json.dumps(data) + '\n')
 
