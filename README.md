@@ -19,6 +19,11 @@ iOS17性能测试脚本参考：https://github.com/15525730080/iOS17_perf
 sudo python3 ios/ios17Perf.py --bundle_id tv.danmaku.bilianime --udid 00008101-00185468217A001E
 ctrl+c结束测试，结束后等待报告生成
 
+
+iOS17以下性能测试执行命令：
+python3 ios/ios.py --bundle_id tv.danmaku.bilianime --duration 30 --interval 1
+
+
 测试报告：
 ![ios_17+_perf.png](ios_17%2B_perf.png)
 
