@@ -151,11 +151,11 @@ def plot_data(cpu_data, memory_data, fps_data, jank_data, big_jank_data):
     _, jank_values = zip(*jank_data)
     _, big_jank_values = zip(*big_jank_data)
 
-    # 创建一个宽度为12英寸，高度为6英寸的图形
-    plt.figure(figsize=(24, 6))
+    # 创建一个宽度为12英寸，高度为8英寸的图形，以适应上下两个子图
+    plt.figure(figsize=(24, 16))
 
-    # 左图：CPU和内存数据
-    plt.subplot(1, 2, 1)
+    # 上图：CPU和内存数据
+    plt.subplot(2, 1, 1)
     plt.plot(timestamps, [val * 100 for val in cpu_values], label='CPU Usage (%)', color='g', marker='s')
     plt.plot(timestamps, mem_values, label='Memory Usage', color='r', marker='^')
 
@@ -174,8 +174,8 @@ def plot_data(cpu_data, memory_data, fps_data, jank_data, big_jank_data):
     plt.xticks(rotation=90)
     plt.legend()
 
-    # 右图：FPS、Jank和BigJank数据
-    plt.subplot(1, 2, 2)
+    # 下图：FPS、Jank和BigJank数据
+    plt.subplot(2, 1, 2)
     plt.plot(timestamps, fps_values, label='FPS', color='b', marker='o')
     plt.plot(timestamps, jank_values, label='Jank Count', color='m', marker='x')
     plt.plot(timestamps, big_jank_values, label='BigJank Count', color='y', marker='d')
@@ -196,7 +196,7 @@ def plot_data(cpu_data, memory_data, fps_data, jank_data, big_jank_data):
     plt.xlabel('Time')
     plt.ylabel('Value')
     plt.title('FPS, Jank and BigJank Over Time')
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=90)
     plt.legend()
 
     # 保存和展示图像
