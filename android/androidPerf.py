@@ -157,7 +157,7 @@ def plot_data(cpu_data, memory_data, fps_data, jank_data, big_jank_data):
     # 左图：CPU和内存数据
     plt.subplot(1, 2, 1)
     plt.plot(timestamps, [val * 100 for val in cpu_values], label='CPU Usage (%)', color='g', marker='s')
-    plt.plot(timestamps, mem_values, label='Memory Usage (MB)', color='r', marker='^')
+    plt.plot(timestamps, mem_values, label='Memory Usage', color='r', marker='^')
 
     for i, txt in enumerate(cpu_values):
         if i % 2 == 0:  # 每隔一个点展示一次数值
@@ -171,7 +171,7 @@ def plot_data(cpu_data, memory_data, fps_data, jank_data, big_jank_data):
     plt.xlabel('Time')
     plt.ylabel('Value')
     plt.title('CPU and Memory Usage Over Time')
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=90)
     plt.legend()
 
     # 右图：FPS、Jank和BigJank数据
