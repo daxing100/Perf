@@ -68,9 +68,8 @@ def calculate_normalized_cpu_usage(prev_times, current_times, max_freq_sum):
 
 
 """
-PSS Memory，统计结果和Android Java API标准结果一
+统计PSS Memory，统计结果和Android Java API标准结果一
 """
-
 
 def get_memory_usage(package_name):
     # Run adb shell dumpsys meminfo <package_name> | grep 'TOTAL'
@@ -91,8 +90,12 @@ def get_memory_usage(package_name):
 
 
 def get_realtime_fps():
-    output = subprocess.getoutput("adb shell dumpsys SurfaceFlinger --latency")  # 获取的数值时间单位为纳秒
+    """
+    使用adb shell dumpsys SurfaceFlinger --latency获取SurfaceFlinger 的帧延迟数据，以纳秒为单位。
+    """
+    output = subprocess.getoutput("adb shell dumpsys SurfaceFlinger --latency") 
 
+    # 计算 frame_times_ns 中所有帧延迟时间的平均值（单位为纳秒），然后将其转换为秒。
     frame_times_ns = []
     for line in output.splitlines():
         try:
@@ -105,7 +108,7 @@ def get_realtime_fps():
         return None
 
     avg_frame_time_ns = sum(frame_times_ns) / len(frame_times_ns)
-    avg_frame_time_s = avg_frame_time_ns / 1e9  # 纳秒单位转为秒
+    avg_frame_time_s = avg_frame_time_ns / 1e9  
     fps = 1 / avg_frame_time_s
     return fps, frame_times_ns
 
