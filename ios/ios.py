@@ -29,6 +29,9 @@ big_jank_data = []
 
 
 def calculate_jank(current_fps):
+    """
+    计算Jank和bigJank
+    """
     if current_fps == 0:
         return
     current_frame_time = 1 / current_fps * 1000
@@ -50,6 +53,9 @@ def calculate_jank(current_fps):
 
 
 def callback(_type: tidevice.DataType, value: dict):
+    """
+    处理获取到的数据
+    """
     timestamp = ti.time()
     formatted_time = datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
     if _type == DataType.CPU:
@@ -65,6 +71,7 @@ def callback(_type: tidevice.DataType, value: dict):
 def main(bundle_id, duration, interval):
     # 连接设备
     t = tidevice.Device()
+    # 对设备进行性能监控
     perf = tidevice.Performance(t, [
         DataType.CPU,
         DataType.MEMORY,
