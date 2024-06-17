@@ -3,9 +3,7 @@
 sudo python3 iosPerf.pt > data.txt
 """
 
-import argparse
 import dataclasses
-import json
 import os
 import platform
 import re
