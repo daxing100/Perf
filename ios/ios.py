@@ -5,7 +5,7 @@ import time as ti
 import matplotlib.pyplot as plt
 import tidevice
 from tidevice._perf import DataType
-
+from getDeviceInfo import cpu_cores
 
 # 连接设备
 t = tidevice.Device()
@@ -103,7 +103,9 @@ def main(bundle_id, duration, interval):
 
     for i, (time, value) in enumerate(zip(cpu_times, cpu_values)):
         if i % 2 == 0:
-            ax1.text(time, value['value'], f"{round((value['value'] / 6), 2)}", color='blue', fontsize=8, ha='center',
+            cpu_core = cpu_cores()
+            print(cpu_core)
+            ax1.text(time, value['value'], f"{round((value['value'] / cpu_core), 2)}", color='blue', fontsize=8, ha='center',
                      va='bottom')
 
     # 为内存使用创建第二个 y 轴

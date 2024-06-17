@@ -1,7 +1,9 @@
 import re
 import json
-from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
+from getDeviceInfo import cpu_cores
+from datetime import datetime, timedelta
+
 
 # 从文件中读取数据
 def dealData(file):
@@ -26,6 +28,7 @@ def dealData(file):
                 cpu_match = re.search(r'([\d.]+) %', cpu)
                 if cpu_match:
                     # 假设6代表测试设备的CPU核数
+                    cpu_core = cpu_cores()
                     cpu_data.append(float(cpu_match.group(1)) / 6)
 
             # 提取内存信息
@@ -104,7 +107,7 @@ def dealData(file):
 
     plt.suptitle('IOS 17+ Perf')
     plt.xticks(rotation=90)
-    plt.grid(True)
+
 
     plt.tight_layout(rect=(0, 0, 1, 0.96))
     plt.savefig('ios_17+_perf.png')
