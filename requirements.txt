@@ -1,3 +1,4 @@
 pymobiledevice3
+py-ios-device
 matplotlib~=3.9.0
 tidevice~=0.11.1
